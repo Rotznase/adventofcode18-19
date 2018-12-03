@@ -10,30 +10,40 @@ public class Day03 extends AdventOfCodeRunner {
     @Override
     public void run() {
 
-        char[][] fabric = new char[1000][1000];
+        int[][] fabric = new int[1000][1000];
         for (String s: input) {
             Claim claim = Claim.parse(s);
             draw(fabric, claim);
         }
 
-        int overlapCounter = count(fabric, 'x');
+        int overlapCounter = count(fabric, -1);
         System.out.println("Result Part 1: overlapCounter="+overlapCounter);
 
+        int id=0;
+        for (String s: input) {
+            Claim claim = Claim.parse(s);
+            if (!overlaps(fabric, claim)) {
+                id = claim.id;
+                break;
+            }
+        }
+
+        System.out.println("Result Part 2: Id="+id);
     }
 
-    private void draw(char[][] fabric, Claim claim) {
+    private void draw(int[][] fabric, Claim claim) {
         for (int x=claim.x; x<claim.x+claim.w; x++) {
             for (int y=claim.y; y<claim.y+claim.h; y++) {
                 if (fabric[y][x] == 0) {
-                    fabric[y][x] = 'o';
+                    fabric[y][x] = claim.id;
                 } else {
-                    fabric[y][x] = 'x';
+                    fabric[y][x] = -1;
                 }
             }
         }
     }
 
-    private int count(char[][] fabric, char c) {
+    private int count(int[][] fabric, int c) {
         int counter = 0;
         //noinspection ForLoopReplaceableByForEach
         for (int y=0; y<fabric.length; y++) {
@@ -44,6 +54,18 @@ public class Day03 extends AdventOfCodeRunner {
             }
         }
         return counter;
+    }
+
+    private boolean overlaps(int[][] fabric, Claim claim) {
+        for (int x=claim.x; x<claim.x+claim.w; x++) {
+            for (int y=claim.y; y<claim.y+claim.h; y++) {
+                if (fabric[y][x] != claim.id) {
+                    return true;
+                }
+            }
+        }
+
+        return false;
     }
 
     private static class Claim {
