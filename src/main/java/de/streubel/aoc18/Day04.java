@@ -11,7 +11,6 @@ import org.joda.time.format.DateTimeFormatter;
 import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-import java.util.stream.Collectors;
 
 
 public class Day04 extends AdventOfCodeRunner {
@@ -21,22 +20,33 @@ public class Day04 extends AdventOfCodeRunner {
         SortedMap<DateTime, LogEntry> log = scanInput(input);
         provideMissingGuardIds(log);
 
-        List<LogEntry> logEntriesAfterMidnight = log.values().stream()
-                .filter(logEntry -> logEntry.time.getHourOfDay() == 0).collect(Collectors.toList());
+        List<LogEntry> logEntriesAfterMidnight = new ArrayList<>(log.values());
 
 
         Multimap<Integer, Range<Integer>> cycles = recordSleepCycles(logEntriesAfterMidnight);
 
         int guardCandidate = findGuardAsleepMost(cycles);
 
-        Collection<Range<Integer>> sleepCycles = cycles.get(guardCandidate);
+        int minuteCandidate = findMinuteMaxAsleep(cycles.get(guardCandidate))[0];
 
-        int minuteCandidate = findMinuteMaxAsleep(sleepCycles);
+        System.out.println("Result Part 1: "+(guardCandidate*minuteCandidate));
 
-        System.out.println(guardCandidate*minuteCandidate);
+
+        minuteCandidate = 0;
+        guardCandidate = -1;
+        int maxMinuteCount = 0;
+        for (int guardId: cycles.keySet()) {
+            int[] minutesAsleep = findMinuteMaxAsleep(cycles.get(guardId));
+            if (minutesAsleep[1] > maxMinuteCount) {
+                maxMinuteCount = minutesAsleep[1];
+                minuteCandidate = minutesAsleep[0];
+                guardCandidate = guardId;
+            }
+        }
+        System.out.println("Result Part 2: "+(guardCandidate*minuteCandidate));
     }
 
-    private int findMinuteMaxAsleep(Collection<Range<Integer>> sleepCycles) {
+    private int[] findMinuteMaxAsleep(Collection<Range<Integer>> sleepCycles) {
         int count=0;
         int maxCount = 0;
         int minuteCandidate = -1;
@@ -52,7 +62,7 @@ public class Day04 extends AdventOfCodeRunner {
             }
             count = 0;
         }
-        return minuteCandidate;
+        return new int[] {minuteCandidate, maxCount};
     }
 
     private Multimap<Integer, Range<Integer>> recordSleepCycles(List<LogEntry> logEntriesAfterMidnight) {
