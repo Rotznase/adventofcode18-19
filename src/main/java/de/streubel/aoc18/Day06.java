@@ -29,6 +29,19 @@ public class Day06 extends AdventOfCodeRunner {
 
         System.out.println("Result Part 1: "+maxArea);
 
+
+        Set<Coord> region = new HashSet<>();
+        for (int x=boundary.minX; x<=boundary.maxX; x++) {
+            for (int y=boundary.minY; y<=boundary.maxY; y++) {
+                Coord c = new Coord(x, y);
+                int l = c.totalDistance(places);
+                if (l < 10000) {
+                    region.add(c);
+                }
+            }
+        }
+        System.out.println("Result Part 2: "+region.size());
+
     }
 
     private SetMultimap<Coord, Coord> getAreaMapping(Set<Coord> places, Boundary boundary) {
@@ -102,6 +115,14 @@ public class Day06 extends AdventOfCodeRunner {
             }
 
             return nearby;
+        }
+
+        private int totalDistance(Set<Coord> places) {
+            int totalDistance = 0;
+            for (Coord c: places) {
+                totalDistance += distance(c);
+            }
+            return totalDistance;
         }
 
         @Override
