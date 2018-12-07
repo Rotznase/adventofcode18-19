@@ -20,10 +20,34 @@ public class Day07 extends AdventOfCodeRunner {
         Graph graph = Graph.parse(input);
         Node firstNode = graph.findFirstNode();
 
-        String path = firstNode.recordPath();
+        SortedSet<Node> available = new TreeSet<>(nodeOrdering);
+        available.add(firstNode);
+        String path = recordPath(available);
 
         System.out.println("Result Part 1: "+ path);
     }
+
+    private static String recordPath(SortedSet<Node> available) {
+        StringBuilder path = new StringBuilder();
+
+        while (!available.isEmpty()) {
+            Node node = available.first();
+            available.remove(node);
+
+            path.append(node.name);
+            node.visited = true;
+            for (Edge edge : node.connections) {
+                edge.end.counter--;
+                if (edge.end.counter <= 0 && !edge.end.visited) {
+                    available.add(edge.end);
+                }
+            }
+        }
+
+        return path.toString();
+    }
+
+
 
     public static class Node {
         String name;
@@ -41,21 +65,6 @@ public class Day07 extends AdventOfCodeRunner {
         void addEdgeTo(Node end) {
             connections.add(new Edge(this, end));
         }
-
-        String recordPath() {
-            StringBuilder path = new StringBuilder(name);
-            visited = true;
-            for (Edge edge: connections) {
-                edge.end.counter--;
-            }
-            for (Edge edge: edgeOrdering.sortedCopy(connections)) {
-                if (edge.end.counter <= 0 && !edge.end.visited)
-                    path.append(edge.end.recordPath());
-            }
-
-            return path.toString();
-        }
-
 
         public String toString() {
             return name;
@@ -131,7 +140,7 @@ public class Day07 extends AdventOfCodeRunner {
     }
 
     @SuppressWarnings("ConstantConditions")
-    private static Ordering<Edge> edgeOrdering = Ordering.natural()
-            .onResultOf((Function<Edge, String>) edge -> edge.end.name);
+    private static Ordering<Node> nodeOrdering = Ordering.natural()
+            .onResultOf((Function<Node, String>) node -> node.name);
 
 }
