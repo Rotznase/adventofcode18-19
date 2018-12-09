@@ -6,10 +6,13 @@ import com.google.common.collect.Iterables;
 import com.google.common.collect.Ordering;
 import com.google.common.collect.Sets;
 import de.streubel.AdventOfCodeRunner;
+import org.checkerframework.checker.nullness.qual.Nullable;
 
 import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 
 public class Day07 extends AdventOfCodeRunner {
@@ -25,6 +28,64 @@ public class Day07 extends AdventOfCodeRunner {
         String path = recordPath(available);
 
         System.out.println("Result Part 1: "+ path);
+
+
+        List<Worker> workers = new ArrayList<>();
+        workers.add(new Worker("Worker 1"));
+        workers.add(new Worker("Worker 2"));
+        workers.add(new Worker("Worker 3"));
+        workers.add(new Worker("Worker 4"));
+        workers.add(new Worker("Worker 5"));
+
+
+        graph = Graph.parse(input);
+        firstNode = graph.findFirstNode();
+        available.clear();
+
+        List<Node> inbox = new ArrayList<>();
+
+        inbox.add(firstNode);
+
+        int seconds = 0;
+        int nrOfBusyWorkers = 0;
+
+        while (!inbox.isEmpty() || nrOfBusyWorkers > 0) {
+
+            List<Worker> idleWorkers = workers.stream().filter(Worker::isIdle).collect(Collectors.toList());
+
+            int min = Math.min(inbox.size(), idleWorkers.size());
+            for (int i = 0; i < min; i++) {
+                Node task = inbox.get(0);
+                idleWorkers.get(i).assignTask(task);
+                inbox.remove(task);
+            }
+
+            workers.stream().filter(Worker::isBusy).forEach(Worker::perform);
+
+            List<Node> finishedTasks = workers.stream().filter(Worker::hasFinished).map((Function<Worker, Node>) Worker::fetchTask).collect(Collectors.toList());
+
+            available.addAll(finishedTasks);
+
+            seconds++;
+
+
+            if (!available.isEmpty()) {
+                Node node = available.first();
+                available.remove(node);
+
+                node.visited = true;
+                for (Edge edge : node.connections) {
+                    edge.end.counter--;
+                    if (edge.end.counter <= 0 && !edge.end.visited) {
+                        inbox.add(edge.end);
+                    }
+                }
+            }
+
+            nrOfBusyWorkers = workers.stream().filter(Worker::isBusy).collect(Collectors.toList()).size();
+        }
+
+        System.out.println("Result Part 2: "+ seconds);
     }
 
     private static String recordPath(SortedSet<Node> available) {
@@ -64,6 +125,10 @@ public class Day07 extends AdventOfCodeRunner {
 
         void addEdgeTo(Node end) {
             connections.add(new Edge(this, end));
+        }
+
+        int taskDuration() {
+            return 60 + name.charAt(0) - 'A' + 1;
         }
 
         public String toString() {
@@ -136,6 +201,41 @@ public class Day07 extends AdventOfCodeRunner {
             }
 
             return graph;
+        }
+    }
+
+
+    public static class Worker {
+        String name;
+        Node task;
+        int remainingSec;
+
+        Worker(String name) {
+            this.name = name;
+            this.remainingSec = -1;
+        }
+
+        void assignTask(Node task) {
+            this.task = task;
+            remainingSec = task.taskDuration();
+        }
+        void perform() {
+            remainingSec--;
+        }
+        Node fetchTask() {
+            Node task = this.task;
+            this.task = null;
+            remainingSec = -1;
+            return task;
+        }
+        boolean isIdle() {
+            return remainingSec < 0;
+        }
+        boolean isBusy() {
+            return remainingSec > 0;
+        }
+        boolean hasFinished() {
+            return remainingSec == 0;
         }
     }
 
