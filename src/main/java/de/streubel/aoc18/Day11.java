@@ -1,5 +1,6 @@
 package de.streubel.aoc18;
 
+import com.google.common.collect.Range;
 import de.streubel.AdventOfCodeRunner;
 
 import java.util.List;
@@ -10,6 +11,12 @@ public class Day11 extends AdventOfCodeRunner {
 
     private CellAdress cellAdressOfLargestPower;
     private int largestPower;
+    private int maxSubgridSize;
+    private Range<Integer> gridRange;
+
+    public Day11() {
+        this.gridRange = Range.closedOpen(1, 300);
+    }
 
     @Override
     public void run(List<String> input) {
@@ -19,16 +26,26 @@ public class Day11 extends AdventOfCodeRunner {
 
         fillFuelGrid(fuelGrid, gridSerialNumber);
 
-        int[][] packed = pack33Grid(fuelGrid);
+        largestPower = Integer.MIN_VALUE;
+        maxSubgridSize = 0;
+        for (int subgridSize = gridRange.lowerEndpoint(); subgridSize<gridRange.upperEndpoint(); subgridSize++) {
+            int[][] packed = packSubgrid(fuelGrid, subgridSize);
 
-        cellAdressOfLargestPower = findLargestGridAdress(packed);
+            CellAdress cellAddress = findLargestGridAdress(packed, subgridSize);
 
-        int[][] subgrid = extractSubgrid(fuelGrid, cellAdressOfLargestPower);
+            int[][] subgrid = extractSubgrid(fuelGrid, cellAddress, subgridSize);
 
-        largestPower = sum(subgrid);
+            int x  = sum(subgrid);
+            if (x > largestPower) {
+                maxSubgridSize = subgridSize;
+                largestPower = x;
+                cellAdressOfLargestPower = cellAddress;
+            }
+        }
 
-        System.out.println("largestPower="+largestPower);
-        System.out.println("cellAdressOfLargestPower="+cellAdressOfLargestPower);
+        System.out.println("largestPower = "+largestPower);
+        System.out.println("cellAdressOfLargestPower = "+cellAdressOfLargestPower);
+        System.out.println("maxSubgridSize = "+maxSubgridSize);
     }
 
     public CellAdress getCellAdressOfLargestPower() {
@@ -37,6 +54,14 @@ public class Day11 extends AdventOfCodeRunner {
 
     public int getLargestPower() {
         return largestPower;
+    }
+
+    public int getMaxSubgridSize() {
+        return maxSubgridSize;
+    }
+
+    public void setGridRange(Range<Integer> gridRange) {
+        this.gridRange = gridRange;
     }
 
     private int sum(int[][] grid) {
@@ -50,22 +75,22 @@ public class Day11 extends AdventOfCodeRunner {
         return sum;
     }
 
-    private int[][] extractSubgrid(int[][] fuelGrid, CellAdress cellAdress) {
-        int[][] subgrid = new int[3][3];
-        for (int y=0; y<3; y++) {
+    private int[][] extractSubgrid(int[][] fuelGrid, CellAdress cellAdress, int subgridSize) {
+        int[][] subgrid = new int[subgridSize][subgridSize];
+        for (int y=0; y<subgridSize; y++) {
             //noinspection ManualArrayCopy
-            for (int x=0; x<3; x++) {
+            for (int x=0; x<subgridSize; x++) {
                 subgrid[y][x] = fuelGrid[cellAdress.y-1+y][cellAdress.x-1+x];
             }
         }
         return subgrid;
     }
 
-    private CellAdress findLargestGridAdress(int[][] packed) {
+    private CellAdress findLargestGridAdress(int[][] packed, int subgridSize) {
         CellAdress cellAdress = null;
         int largestTotalPower = Integer.MIN_VALUE;
-        for (int y=0; y<packed.length-3; y++) {
-            for (int x=0; x<packed[y].length-3; x++) {
+        for (int y=0; y<packed.length-subgridSize; y++) {
+            for (int x=0; x<packed[y].length-subgridSize; x++) {
                 if (packed[y][x] >= largestTotalPower) {
                     cellAdress = new CellAdress(x+1, y+1);
                     largestTotalPower = packed[y][x];
@@ -75,11 +100,11 @@ public class Day11 extends AdventOfCodeRunner {
         return cellAdress;
     }
 
-    private int[][] pack33Grid(int[][] fuelGrid) {
+    private int[][] packSubgrid(int[][] fuelGrid, int subgridSize) {
         int[][] packed = new int[fuelGrid.length][fuelGrid[0].length];
         for (int y=0; y<packed.length; y++) {
             for (int x=0; x<packed[y].length; x++) {
-                packed[y][x] = sum33Grid(fuelGrid, x, y);
+                packed[y][x] = sumSubgrid(fuelGrid, x, y, subgridSize);
             }
         }
 
@@ -94,10 +119,10 @@ public class Day11 extends AdventOfCodeRunner {
         }
     }
 
-    private int sum33Grid(int[][] fuelGrid, int x, int y) {
+    private int sumSubgrid(int[][] fuelGrid, int x, int y, int subgridSize) {
         int sum = 0;
-        for (int yy=y; yy<Math.min(y+3, fuelGrid.length); yy++) {
-            for (int xx=x; xx<Math.min(x+3, fuelGrid[yy].length); xx++) {
+        for (int yy=y; yy<Math.min(y+subgridSize, fuelGrid.length); yy++) {
+            for (int xx=x; xx<Math.min(x+subgridSize, fuelGrid[yy].length); xx++) {
                 sum += fuelGrid[yy][xx];
             }
         }
