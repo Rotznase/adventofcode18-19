@@ -35,4 +35,22 @@ public class Day11Test {
         assertEquals(new Day11.CellAdress(21, 61), day11.getCellAdressOfLargestPower());
         assertEquals(30, day11.getLargestPower());
     }
+
+    @Test
+    public void testTotalPowerOpenGrid18() {
+        Day11 day11 = new Day11();
+        day11.setGridRange(Range.closedOpen(1,300));
+        day11.run(Collections.singletonList("18"));
+        assertEquals(new Day11.CellAdress(90,269), day11.getCellAdressOfLargestPower());
+        assertEquals(16, day11.getMaxSubgridSize());
+    }
+
+    @Test
+    public void testTotalPowerOpenGrid42() {
+        Day11 day11 = new Day11();
+        day11.setGridRange(Range.closedOpen(1,300));
+        day11.run(Collections.singletonList("42"));
+        assertEquals(new Day11.CellAdress(232,251), day11.getCellAdressOfLargestPower());
+        assertEquals(12, day11.getMaxSubgridSize());
+    }
 }
