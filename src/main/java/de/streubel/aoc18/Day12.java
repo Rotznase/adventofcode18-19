@@ -19,13 +19,20 @@ public class Day12 extends AdventOfCodeRunner {
 
         System.out.println(String.format("% 2d: %s", 0, potGeneration));
 
-        for (int i=1; i<21; i++) {
+        long N = 21;
+        for (long i=1; i<N; i++) {
             potGeneration.nextGeneration();
             System.out.println(String.format("% 2d: %s", i, potGeneration));
         }
 
+        System.out.println("Result Part 1: "+potGeneration.value());
 
-        System.out.println(potGeneration.value());
+        // After iteration 100 the pots corresponds to the pattern .##...##...##...##...##...##...##...##...##...##...##...##...##...##...##...##...##...##...##...##...##...##...##...##...##...##...##...##...##...##...##...##...##...##...##...##...##...##...##...##.....
+        // which is constantly shifting by 1 to the right with each subsequent iteration.
+        // With that in mind the sum of the numbers of all pots can be calculated by hand:
+        N = 50000000000L;
+        long sum = 40*(2+3)+10*39*40/2 + 40*2*(N-100);
+        System.out.println("Result Part 2: "+sum);
     }
 
     public static class PotGeneration {
