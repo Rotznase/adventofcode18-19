@@ -13,34 +13,81 @@ public class Day14 extends AdventOfCodeRunner {
     @Override
     public void run(List<String> input) {
 
+        {
+            Receip first = new Receip('3');
+            Receip last = first.append(new Receip('7'));
 
-        Receip first = new Receip('3');
-        Receip last = first.append(new Receip('7'));
+            Receip elf1 = first;
+            Receip elf2 = last;
 
-        Receip elf1 = first;
-        Receip elf2 = last;
+            int N = Integer.parseInt(input.get(0));
+            for (int n = 0; n < N + 10; n++) {
+                int score1 = elf1.score - '0';
+                int score2 = elf2.score - '0';
+                int newScore = score1 + score2;
 
-        int N = Integer.parseInt(input.get(0));
-        for (int n=0; n<N+10; n++) {
-            int score1 = elf1.score - '0';
-            int score2 = elf2.score - '0';
-            int newScore = score1 + score2;
+                char[] chars = String.valueOf(newScore).toCharArray();
+                for (int i = 0; i < chars.length; i++) {
+                    last = last.append(new Receip(chars[i]));
+                }
 
-            char[] chars = String.valueOf(newScore).toCharArray();
-            for (int i=0; i<chars.length; i++) {
-                last = last.append(new Receip(chars[i]));
+                for (int i = 0; i < score1 + 1; i++) {
+                    elf1 = elf1.next;
+                }
+                for (int i = 0; i < score2 + 1; i++) {
+                    elf2 = elf2.next;
+                }
+
             }
 
-            for (int i=0; i<score1+1; i++) {
-                elf1 = elf1.next;
-            }
-            for (int i=0; i<score2+1; i++) {
-                elf2 = elf2.next;
-            }
-
+            System.out.println("Result Part 1: "+printLast10(first, N));
         }
 
-        System.out.println(printLast10(first, N));
+
+        {
+            Receip first = new Receip('3');
+            Receip last = first.append(new Receip('7'));
+
+            Receip elf1 = first;
+            Receip elf2 = last;
+
+            StringBuilder sb = new StringBuilder(toString(first));
+            String str = input.get(0);
+
+            long nrOfLeftReceips = 0;
+            while (true) {
+                int score1 = elf1.score - '0';
+                int score2 = elf2.score - '0';
+                int newScore = score1 + score2;
+
+                char[] chars = String.valueOf(newScore).toCharArray();
+                for (int i = 0; i < chars.length; i++) {
+                    last = last.append(new Receip(chars[i]));
+                    sb.append(toString(last));
+                }
+
+                for (int i = 0; i < score1 + 1; i++) {
+                    elf1 = elf1.next;
+                }
+                for (int i = 0; i < score2 + 1; i++) {
+                    elf2 = elf2.next;
+                }
+
+                if (sb.indexOf(str) >= 0) {
+                    nrOfLeftReceips += sb.indexOf(str);
+                    break;
+                }
+
+                int x = sb.length() - str.length();
+                if (x > 0) {
+                    sb.delete(0, x);
+                    nrOfLeftReceips += x;
+                }
+            }
+
+            System.out.println("Result Part 2: "+nrOfLeftReceips);
+        }
+
 
     }
 
@@ -61,8 +108,10 @@ public class Day14 extends AdventOfCodeRunner {
 
     private String toString(Receip first) {
         StringBuilder sb = new StringBuilder(""+first.score);
-        for (Receip r = first.next; r != first; r = r.next) {
+        Receip r = first.next;
+        while (r.pos > 0) {
             sb.append(r.score);
+            r = r.next;
         }
         return sb.toString();
     }
