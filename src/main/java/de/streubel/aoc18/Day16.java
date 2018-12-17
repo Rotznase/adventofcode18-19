@@ -1,9 +1,9 @@
 package de.streubel.aoc18;
 
+import com.google.common.collect.Iterables;
 import de.streubel.AdventOfCodeRunner;
 
-import java.util.Arrays;
-import java.util.List;
+import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -35,6 +35,8 @@ public class Day16 extends AdventOfCodeRunner {
         int[] regBefore = null;
         int[] regAfter = null;
         int[] args = null;
+
+        Map<Integer, Instr> opcodeInstr = new HashMap<>();
 
         for (String line: input) {
 
@@ -69,29 +71,74 @@ public class Day16 extends AdventOfCodeRunner {
                 int argB = args[2];
                 int argC = args[3];
 
-                int instructionCounter = 0;
+                List<Instr> candidates = new ArrayList<>();
                 for (Instr instr : instructions) {
                     instr.setArgs(argA, argB, argC);
                     instr.setRegister(regBefore);
                     instr.exec();
                     int[] reg = instr.getRegister();
-                    if (Arrays.equals(reg, regAfter))
-                        instructionCounter++;
+                    if (Arrays.equals(reg, regAfter)) {
+                        candidates.add(instr);
+                    }
                 }
 
-                if (instructionCounter >= 3) {
+                if (candidates.size() >= 3)
                     result++;
-                }
+
+                Iterables.removeIf(candidates, instr -> opcodeInstr.values().contains(instr));
+                if (candidates.size() == 1)
+                    opcodeInstr.put(opcode, candidates.get(0));
 
                 regAfter = null;
                 regBefore = null;
                 args = null;
             }
-
-
         }
 
         System.out.println("Result Part 1: "+result);
+
+        int emptyLine = 0;
+        int l;
+        for (l = 0; l<input.size(); l++) {
+            if (input.get(l).equals(""))
+                emptyLine++;
+            else
+                emptyLine = 0;
+
+            if (emptyLine >= 3)
+                break;
+        }
+        l++;
+
+        int[] register = {0, 0, 0, 0};
+        args = null;
+
+        for (; l<input.size(); l++) {
+            matcher = instrPattern.matcher(input.get(l));
+            if (matcher.matches()) {
+                args = new int[matcher.groupCount()];
+                for (int i=0; i<args.length ; i++) {
+                    args[i] = Integer.parseInt(matcher.group(i+1));
+                }
+            }
+
+            if (args != null) {
+                Instr instr = opcodeInstr.get(args[0]);
+                if (instr != null) {
+                    instr.setRegister(register);
+                    instr.setArgs(args[1], args[2], args[3]);
+                    instr.exec();
+                    System.arraycopy(instr.getRegister(), 0, register, 0, register.length);
+                } else {
+                    throw new RuntimeException();
+                }
+            } else {
+                throw new RuntimeException();
+            }
+        }
+
+        //5927797001713954464
+        System.out.println("Result Part 2: "+register[0]);
     }
 
     static abstract class Instr {
@@ -114,6 +161,10 @@ public class Day16 extends AdventOfCodeRunner {
 
         void setRegister(int[] register) {
             System.arraycopy(register, 0, this.register, 0, register.length);
+        }
+
+        public String toString() {
+            return getClass().getSimpleName();
         }
     }
 
