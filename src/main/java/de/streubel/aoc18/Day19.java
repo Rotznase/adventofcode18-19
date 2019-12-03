@@ -1,7 +1,7 @@
 package de.streubel.aoc18;
 
 import de.streubel.AdventOfCodeRunner;
-import de.streubel.aoc18.Day16.*;
+import de.streubel.aoc18.Instr.*;
 
 import java.util.ArrayList;
 import java.util.List;
