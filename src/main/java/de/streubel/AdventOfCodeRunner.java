@@ -7,13 +7,15 @@ import java.util.List;
 public abstract class AdventOfCodeRunner {
 
     public static void main(String[] args) throws Exception {
-        final int dayNr = Integer.parseInt(args[0]);
+        final int yearNr = Integer.parseInt(args[0]);
+        final int dayNr = Integer.parseInt(args[1]);
 
-        final String className = String.format("de.streubel.aoc18.Day%02d", dayNr);
+        final String className = String.format("de.streubel.aoc%02d.Day%02d", yearNr, dayNr);
         final Class<?> clazz = Class.forName(className);
         AdventOfCodeRunner runner = (AdventOfCodeRunner) clazz.newInstance();
 
-        List<String> input = Files.readAllLines(Paths.get("./src/main/java/de/streubel/aoc18/resources/input"+clazz.getSimpleName()+".txt"));
+        final String resourceName = String.format("./src/main/java/de/streubel/aoc%02d/resources/inputDay%02d.txt", yearNr, dayNr);
+        List<String> input = Files.readAllLines(Paths.get(resourceName));
 
         runner.run(input);
     }
