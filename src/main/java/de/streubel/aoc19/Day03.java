@@ -1,12 +1,11 @@
 package de.streubel.aoc19;
 
 import com.google.common.base.Objects;
-import com.google.common.collect.Maps;
-import com.google.common.collect.Ordering;
 import com.google.common.collect.Sets;
 import de.streubel.AdventOfCodeRunner;
 
 import java.util.*;
+import java.util.stream.IntStream;
 
 public class Day03 extends AdventOfCodeRunner {
 
@@ -18,23 +17,51 @@ public class Day03 extends AdventOfCodeRunner {
     public void run(List<String> stringInput) {
 
         String[] movements1 = stringInput.get(0).split(",");
-        Set<Coord> path1 = recordPath(movements1);
+        List<Coord> path1 = recordPath(movements1);
 
         String[] movements2 = stringInput.get(1).split(",");
-        Set<Coord> path2 = recordPath(movements2);
+        List<Coord> path2 = recordPath(movements2);
 
-        final Sets.SetView<Coord> crossings = Sets.intersection(path1, path2);
+        final Sets.SetView<Coord> crossings = Sets.intersection(new HashSet<Coord>(path1), new HashSet<Coord>(path2));
 
-        Map<Integer, Coord> distances = Maps.uniqueIndex(crossings.immutableCopy(),
-                coord -> coord.distanceTo(new Coord(0, 0)));
+        IntStream distances;
+        OptionalInt nearestDistance;
 
-        final Integer nearestDistance = Ordering.natural().min(distances.keySet());
-        System.out.println("Result Part 1 (273): "+nearestDistance);
+        // Part 1
+        distances = crossings
+                .stream()
+                .flatMapToInt(coord -> IntStream.of(coord.distanceTo(new Coord(0, 0))));
+        nearestDistance = distances.min();
+
+        System.out.println("Result Part 1 (273): " + (nearestDistance.isPresent() ? nearestDistance.getAsInt() : null));
+
+
+
+        // Part 1
+        distances = crossings
+                .stream()
+                .flatMapToInt(coord -> IntStream.of(distance(path1, coord) + distance(path2, coord)));
+        nearestDistance = distances.min();
+
+        System.out.println("Result Part 2 (15622): " + (nearestDistance.isPresent() ? nearestDistance.getAsInt() : null));
+
     }
 
-    private Set<Coord> recordPath(String[] movements) {
+    private int distance(List<Coord> path, Coord crossing) {
+        int length = 0;
+        for (Coord c : path) {
+            length++;
+            if (c.equals(crossing)) {
+                break;
+            }
+        }
+
+        return length;
+    }
+
+    private List<Coord> recordPath(String[] movements) {
         Cursor c = new Cursor(0, 0);
-        Set<Coord> path = new LinkedHashSet<>();
+        List<Coord> path = new ArrayList<>();
         for (String move : movements) {
             path.addAll(c.move(move));
         }
@@ -100,6 +127,11 @@ public class Day03 extends AdventOfCodeRunner {
         @Override
         public int hashCode() {
             return Objects.hashCode(x, y);
+        }
+
+        @Override
+        public String toString() {
+            return "[" + x + ", " + y + "]";
         }
     }
 }
