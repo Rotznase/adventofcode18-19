@@ -8,10 +8,6 @@ import java.util.stream.IntStream;
 
 public class Day04 extends AdventOfCodeRunner {
 
-    private static final int ADD = 1;
-    private static final int MUL = 2;
-    private static final int EXT = 99;
-
     @Override
     public void run(List<String> stringInput) {
 
@@ -21,17 +17,23 @@ public class Day04 extends AdventOfCodeRunner {
                 .flatMapToInt(s -> IntStream.of(Integer.parseInt(s)))
                 .toArray();
 
-        int candidateCounter = 0;
+        int candidateCounterPart1 = 0;
+        int candidateCounterPart2 = 0;
         for (int candidate = input[0]; candidate <= input[1]; candidate++) {
-            if (checkCriteria(candidate)) {
-                candidateCounter++;
+            if (checkCriteriaPart1(candidate)) {
+                candidateCounterPart1++;
+
+                if (checkCriteriaPart2(candidate)) {
+                    candidateCounterPart2++;
+                }
             }
         }
 
-        System.out.println("Result Part 1 (1246): " + candidateCounter);
+        System.out.println("Result Part 1 (1246): " + candidateCounterPart1);
+        System.out.println("Result Part 2 (1246): " + candidateCounterPart2);
     }
 
-    private boolean checkCriteria(final int password) {
+    private boolean checkCriteriaPart1(final int password) {
         final char[] chars = String.valueOf(password).toCharArray();
 
         int doubleCounter = 0;
@@ -46,5 +48,26 @@ public class Day04 extends AdventOfCodeRunner {
         }
 
         return doubleCounter >= 1;
+    }
+
+    private boolean checkCriteriaPart2(final int password) {
+        final char[] chars = String.valueOf(password).toCharArray();
+
+        int doubleCounter = 1;
+        char c = chars[0];
+        for (int i = 1; i < chars.length; i++) {
+
+            if (c == chars[i]) {
+                doubleCounter++;
+            } else {
+                if (doubleCounter == 2) {
+                    return true;
+                }
+                doubleCounter = 1;
+                c = chars[i];
+            }
+        }
+
+        return doubleCounter == 2;
     }
 }
