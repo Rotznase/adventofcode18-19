@@ -30,7 +30,7 @@ public class Day04 extends AdventOfCodeRunner {
         }
 
         System.out.println("Result Part 1 (1246): " + candidateCounterPart1);
-        System.out.println("Result Part 2 (1246): " + candidateCounterPart2);
+        System.out.println("Result Part 2 (814): " + candidateCounterPart2);
     }
 
     private boolean checkCriteriaPart1(final int password) {
