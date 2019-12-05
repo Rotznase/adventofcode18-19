@@ -1,8 +1,8 @@
 package de.streubel.aoc19;
 
-import com.google.common.base.Splitter;
 import de.streubel.AdventOfCodeRunner;
 
+import java.util.Arrays;
 import java.util.List;
 import java.util.stream.IntStream;
 
@@ -14,11 +14,9 @@ public class Day02 extends AdventOfCodeRunner {
 
     @Override
     public void run(List<String> stringInput) {
-        int[] input = Splitter
-                .on(",")
-                .trimResults()
-                .splitToList(stringInput.get(0))
-                .stream()
+        int[] input = Arrays
+                .stream(stringInput.get(0).split(","))
+                .map(String::trim)
                 .flatMapToInt(s -> IntStream.of(Integer.parseInt(s)))
                 .toArray();
 
@@ -37,7 +35,7 @@ public class Day02 extends AdventOfCodeRunner {
                 }
             }
         } catch (Exception e) {
-            System.out.println("Result Part 2: "+e.getMessage());
+            System.out.println("Result Part 2 (6086): "+e.getMessage());
         }
 
     }

@@ -9,10 +9,6 @@ import java.util.stream.IntStream;
 
 public class Day03 extends AdventOfCodeRunner {
 
-    private static final int ADD = 1;
-    private static final int MUL = 2;
-    private static final int EXT = 99;
-
     @Override
     public void run(List<String> stringInput) {
 
@@ -22,7 +18,7 @@ public class Day03 extends AdventOfCodeRunner {
         String[] movements2 = stringInput.get(1).split(",");
         List<Coord> path2 = recordPath(movements2);
 
-        final Sets.SetView<Coord> crossings = Sets.intersection(new HashSet<Coord>(path1), new HashSet<Coord>(path2));
+        final Sets.SetView<Coord> crossings = Sets.intersection(new HashSet<>(path1), new HashSet<>(path2));
 
         IntStream distances;
         OptionalInt nearestDistance;

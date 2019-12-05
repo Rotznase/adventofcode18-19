@@ -2,9 +2,7 @@ package de.streubel.aoc19;
 
 import de.streubel.AdventOfCodeRunner;
 
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 
 public class Day01 extends AdventOfCodeRunner {
 
