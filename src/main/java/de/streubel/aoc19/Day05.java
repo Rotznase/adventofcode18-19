@@ -18,15 +18,13 @@ public class Day05 extends AdventOfCodeRunner {
 
         IntCodeComputer computer = new IntCodeComputer();
 
-        computer.setProgram(prog.clone());
         computer.setInput(1);
-        computer.run();
+        computer.run(prog.clone());
         int result = computer.getOutput();
         System.out.println("Result Part 1 (4601506): "+result);
 
-        computer.setProgram(prog.clone());
         computer.setInput(5);
-        computer.run();
+        computer.run(prog.clone());
         result = computer.getOutput();
         System.out.println("Result Part 2 (5525561): "+result);
 

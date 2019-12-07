@@ -16,13 +16,8 @@ public class IntCodeComputer {
     private static final int I_MODE = 1;
 
 
-    private int[] program;
     private int[] input;
     private int output;
-
-    public void setProgram(final int[] program) {
-        this.program = program.clone();
-    }
 
     public void setInput(final int ... input) {
         this.input = input.clone();
@@ -32,7 +27,7 @@ public class IntCodeComputer {
         return output;
     }
 
-    public void run() {
+    public void run(final int[] program) {
         int output = -1;
         int inputCounter = 0;
 
