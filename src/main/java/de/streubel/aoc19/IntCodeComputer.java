@@ -28,7 +28,7 @@ public class IntCodeComputer {
     }
 
     public void run(final int[] program) {
-        int output = -1;
+        output = -1;
         int inputCounter = 0;
 
         for (int pointer=0; pointer<program.length; ) {
@@ -125,9 +125,6 @@ public class IntCodeComputer {
             }
         }
 
-
-
-        this.output = output;
     }
 
     private int[] split(int number) {
