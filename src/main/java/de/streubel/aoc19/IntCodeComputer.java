@@ -17,15 +17,15 @@ public class IntCodeComputer {
 
 
     private int[] program;
-    private int input;
+    private int[] input;
     private int output;
 
     public void setProgram(final int[] program) {
         this.program = program.clone();
     }
 
-    public void setInput(final int input) {
-        this.input = input;
+    public void setInput(final int ... input) {
+        this.input = input.clone();
     }
 
     public int getOutput() {
@@ -34,6 +34,7 @@ public class IntCodeComputer {
 
     public void run() {
         int output = -1;
+        int inputCounter = 0;
 
         for (int pointer=0; pointer<program.length; ) {
             final int[] instrArr = split(program[pointer+0]);
@@ -78,7 +79,7 @@ public class IntCodeComputer {
 
                 case INP:
                     param1 = program[pointer+1];
-                    program[param1] = input;
+                    program[param1] = input[inputCounter++];
                     pointer += 2;
                     break;
 
