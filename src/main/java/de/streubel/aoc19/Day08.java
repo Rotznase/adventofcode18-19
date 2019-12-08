@@ -36,6 +36,35 @@ public class Day08 extends AdventOfCodeRunner {
             System.out.println("Result Part 1 (1572): "+(nrOf1 * nrOf2));
         }
 
-    }
+        // Part 2
+        final char[][] layeredImage = new char[layers.size()][width * height];
 
+        for (int layer = 0; layer < layers.size(); layer++) {
+            layeredImage[layer] = layers.get(layer).toCharArray();
+        }
+
+        final char[] finalImage = new char[width * height];
+
+        for (int i = 0; i < width * height; i++) {
+            for (int layer = 0; layer < layeredImage.length; layer++) {
+                if (layeredImage[layer][i] != '2') {
+                    finalImage[i] = layeredImage[layer][i];
+                    break;
+                }
+            }
+        }
+
+        Splitter
+                .fixedLength(width)
+                .splitToList(new String(finalImage))
+                .forEach(s -> System.out.println(s.replace('0', ' ').replace('1', '\u2588')));
+        /*
+                █  █ █   ██  █ ████ ████
+                █ █  █   ██  █ █    █
+                ██    █ █ ████ ███  ███
+                █ █    █  █  █ █    █
+                █ █    █  █  █ █    █
+                █  █   █  █  █ █    ████
+         */
+    }
 }
