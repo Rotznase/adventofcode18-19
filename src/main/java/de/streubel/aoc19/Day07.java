@@ -58,6 +58,76 @@ public class Day07 extends AdventOfCodeRunner {
         }
 
         System.out.println("Result Part 1 (11828): "+maxSignal);
+
+        permutations = generatePermutations(5, 6, 7, 8, 9);
+        int [] progA = prog.clone();
+        int [] progB = prog.clone();
+        int [] progC = prog.clone();
+        int [] progD = prog.clone();
+        int [] progE = prog.clone();
+
+        int permIter = 1;
+        for (int[] setting : permutations) {
+            Integer intermediateSignal = 0;
+            boolean firstIter = true;
+
+            while (!ampE.hasStopped()) {
+                if (firstIter) {
+                    ampA.setInput(setting[0], intermediateSignal);
+                } else {
+                    ampA.setInput(intermediateSignal);
+                }
+                ampA.run(progA);
+                intermediateSignal = ampA.getOutput();
+
+                if (firstIter) {
+                    ampB.setInput(setting[1], intermediateSignal);
+                } else {
+                    ampB.setInput(intermediateSignal);
+                }
+                ampB.run(progB);
+                intermediateSignal = ampB.getOutput();
+
+                if (firstIter) {
+                    ampC.setInput(setting[2], intermediateSignal);
+                } else {
+                    ampC.setInput(intermediateSignal);
+                }
+                ampC.run(progC);
+                intermediateSignal = ampC.getOutput();
+
+                if (firstIter) {
+                    ampD.setInput(setting[3], intermediateSignal);
+                } else {
+                    ampD.setInput(intermediateSignal);
+                }
+                ampD.run(progD);
+                intermediateSignal = ampD.getOutput();
+
+                if (firstIter) {
+                    ampE.setInput(setting[4], intermediateSignal);
+                } else {
+                    ampE.setInput(intermediateSignal);
+                }
+                ampE.run(progE);
+                intermediateSignal = ampE.getOutput();
+
+                firstIter = false;
+            }
+
+            maxSignal = Math.max(intermediateSignal, maxSignal);
+
+            ampA.reset();
+            ampB.reset();
+            ampC.reset();
+            ampD.reset();
+            ampE.reset();
+
+            permIter++;
+        }
+
+        System.out.println("Result Part 2 (1714298): "+maxSignal);
+
     }
 
     private List<int[]> generatePermutations(final int... ints) {
