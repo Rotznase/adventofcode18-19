@@ -30,22 +30,27 @@ public class Day07 extends AdventOfCodeRunner {
             int intermediateSignal = 0;
 
             ampA.setInput(setting[0], intermediateSignal);
+            ampA.reset();
             ampA.run(prog.clone());
             intermediateSignal = ampA.getOutput();
 
             ampB.setInput(setting[1], intermediateSignal);
+            ampB.reset();
             ampB.run(prog.clone());
             intermediateSignal = ampB.getOutput();
 
             ampC.setInput(setting[2], intermediateSignal);
+            ampC.reset();
             ampC.run(prog.clone());
             intermediateSignal = ampC.getOutput();
 
             ampD.setInput(setting[3], intermediateSignal);
+            ampD.reset();
             ampD.run(prog.clone());
             intermediateSignal = ampD.getOutput();
 
             ampE.setInput(setting[4], intermediateSignal);
+            ampE.reset();
             ampE.run(prog.clone());
             intermediateSignal = ampE.getOutput();
             maxSignal = Math.max(intermediateSignal, maxSignal);

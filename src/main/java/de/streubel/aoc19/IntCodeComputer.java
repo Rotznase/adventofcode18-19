@@ -1,5 +1,10 @@
 package de.streubel.aoc19;
 
+import java.util.ArrayDeque;
+import java.util.Arrays;
+import java.util.Deque;
+import java.util.Queue;
+
 public class IntCodeComputer {
 
     private static final int ADD = 1;
@@ -15,27 +20,49 @@ public class IntCodeComputer {
     private static final int P_MODE = 0;
     private static final int I_MODE = 1;
 
+    public enum State {IDLE, RUNNING, PAUSED, HALTED,}
 
-    private int[] input;
-    private int output;
+    private Queue<Integer> input;
+    private Deque<Integer> output;
+    private int pc;
+    private State state;
 
-    public void setInput(final int ... input) {
-        this.input = input.clone();
+    public IntCodeComputer() {
+        input = new ArrayDeque<>();
+        output = new ArrayDeque<>();
+        pc = 0;
+        state = State.IDLE;
     }
 
-    public int getOutput() {
-        return output;
+    public void setInput(final Integer ... input) {
+        this.input.addAll(Arrays.asList(input));
+    }
+
+    public Integer getLastOutput() {
+        return output.getLast();
+    }
+
+    public Integer getOutput() {
+        return output.poll();
+    }
+
+    public void reset() {
+        pc = 0;
+        state = State.IDLE;
     }
 
     public void run(final int[] program) {
-        output = -1;
-        int inputCounter = 0;
+        state = State.RUNNING;
 
-        for (int pointer=0; pointer<program.length; ) {
-            final int[] instrArr = split(program[pointer+0]);
+        for (;;) {
+            final int[] instrArr = split(program[pc + 0]);
             final int instr = instrArr[0];
 
             if (instr == EXT) {
+                state = State.HALTED;
+            }
+
+            if (state == State.PAUSED || state == State.HALTED) {
                 break;
             }
 
@@ -51,73 +78,77 @@ public class IntCodeComputer {
             int c;
             switch (instr) {
                 case ADD:
-                    param1 = program[pointer+1];
-                    param2 = program[pointer+2];
-                    param3 = program[pointer+3];
+                    param1 = program[pc + 1];
+                    param2 = program[pc + 2];
+                    param3 = program[pc + 3];
                     a = p1Mode == P_MODE ? program[param1] : param1;
                     b = p2Mode == P_MODE ? program[param2] : param2;
                     c = a + b;
                     program[param3] = c;
-                    pointer += 4;
+                    pc += 4;
                     break;
 
                 case MUL:
-                    param1 = program[pointer+1];
-                    param2 = program[pointer+2];
-                    param3 = program[pointer+3];
+                    param1 = program[pc + 1];
+                    param2 = program[pc + 2];
+                    param3 = program[pc + 3];
                     a = p1Mode == P_MODE ? program[param1] : param1;
                     b = p2Mode == P_MODE ? program[param2] : param2;
                     c = a * b;
                     program[param3] = c;
-                    pointer += 4;
+                    pc += 4;
                     break;
 
                 case INP:
-                    param1 = program[pointer+1];
-                    program[param1] = input[inputCounter++];
-                    pointer += 2;
+                    param1 = program[pc + 1];
+                    if (input.isEmpty()) {
+                        state = State.PAUSED;
+                    } else {
+                        program[param1] = input.poll();
+                        pc += 2;
+                    }
                     break;
 
                 case OUP:
-                    param1 = program[pointer+1];
-                    output = p1Mode == P_MODE ? program[param1] : param1;
-                    pointer += 2;
+                    param1 = program[pc + 1];
+                    output.add(p1Mode == P_MODE ? program[param1] : param1);
+                    pc += 2;
                     break;
 
                 case JMP_TRUE:
-                    param1 = program[pointer+1];
-                    param2 = program[pointer+2];
+                    param1 = program[pc + 1];
+                    param2 = program[pc + 2];
                     a = p1Mode == P_MODE ? program[param1] : param1;
                     b = p2Mode == P_MODE ? program[param2] : param2;
-                    pointer = a != 0 ? b : pointer + 3;
+                    pc = a != 0 ? b : pc + 3;
                     break;
 
                 case JMP_FALSE:
-                    param1 = program[pointer+1];
-                    param2 = program[pointer+2];
+                    param1 = program[pc +1];
+                    param2 = program[pc +2];
                     a = p1Mode == P_MODE ? program[param1] : param1;
                     b = p2Mode == P_MODE ? program[param2] : param2;
-                    pointer = a == 0 ? b : pointer + 3;
+                    pc = a == 0 ? b : pc + 3;
                     break;
 
                 case LT:
-                    param1 = program[pointer+1];
-                    param2 = program[pointer+2];
-                    param3 = program[pointer+3];
+                    param1 = program[pc + 1];
+                    param2 = program[pc + 2];
+                    param3 = program[pc + 3];
                     a = p1Mode == P_MODE ? program[param1] : param1;
                     b = p2Mode == P_MODE ? program[param2] : param2;
                     program[param3] = a < b ? 1 : 0;
-                    pointer += 4;
+                    pc += 4;
                     break;
 
                 case EQ:
-                    param1 = program[pointer+1];
-                    param2 = program[pointer+2];
-                    param3 = program[pointer+3];
+                    param1 = program[pc + 1];
+                    param2 = program[pc + 2];
+                    param3 = program[pc + 3];
                     a = p1Mode == P_MODE ? program[param1] : param1;
                     b = p2Mode == P_MODE ? program[param2] : param2;
                     program[param3] = a == b ? 1 : 0;
-                    pointer += 4;
+                    pc += 4;
                     break;
 
                 default:
@@ -125,6 +156,10 @@ public class IntCodeComputer {
             }
         }
 
+    }
+
+    public boolean hasStopped() {
+        return state == State.HALTED;
     }
 
     private int[] split(int number) {

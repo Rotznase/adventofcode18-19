@@ -20,12 +20,13 @@ public class Day05 extends AdventOfCodeRunner {
 
         computer.setInput(1);
         computer.run(prog.clone());
-        int result = computer.getOutput();
+        Integer result = computer.getLastOutput();
         System.out.println("Result Part 1 (4601506): "+result);
 
         computer.setInput(5);
+        computer.reset();
         computer.run(prog.clone());
-        result = computer.getOutput();
+        result = computer.getLastOutput();
         System.out.println("Result Part 2 (5525561): "+result);
 
     }
